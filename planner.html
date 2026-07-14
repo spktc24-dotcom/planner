@@ -66,6 +66,9 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 .goal-step .task-check{width:14px;height:14px;font-size:8px}
 .goal-step-text{flex:1}
 .goal-step-date{font-size:10px;color:var(--muted);flex-shrink:0}
+.goal-step-edit,.goal-step-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:2px 4px;flex-shrink:0;opacity:.6}
+.goal-step-edit:hover{opacity:1;color:var(--accent2)}
+.goal-step-del:hover{opacity:1;color:var(--danger)}
 .goal-actions{display:flex;gap:8px;margin-top:10px}
 .goal-add-step{background:transparent;border:1px dashed var(--border);color:var(--accent2);border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:'Unbounded',sans-serif}
 .goal-add-step:hover{border-color:var(--accent2)}
@@ -917,6 +920,8 @@ function renderGoalsList(){
         <div class="task-check" onclick="toggleTaskByDate('${s.id}','${s.date}')">${s.done?'✓':''}</div>
         <span class="goal-step-text">${esc(s.text)}</span>
         <span class="goal-step-date">${fmtDisplay(s.date)}</span>
+        <button class="goal-step-edit" onclick="editTask('${s.id}','${s.date}')" title="Редагувати">✎</button>
+        <button class="goal-step-del" onclick="deleteTask('${s.id}')" title="Видалити">✕</button>
       </div>`).join(''):'<div class="goal-step" style="color:var(--muted)">Ще немає кроків</div>';
     return `
     <div class="goal-card" style="border-left:3px solid ${color};background:linear-gradient(to right, ${color}35 ${pct}%, var(--card) ${pct}%)">
