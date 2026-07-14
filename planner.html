@@ -874,7 +874,7 @@ function jumpToDate(date){
 function loadGoals(){try{return JSON.parse(localStorage.getItem('planner_goals')||'[]')}catch{return[]}}
 function saveGoalsList(g){localStorage.setItem('planner_goals',JSON.stringify(g))}
 
-const GOAL_COLORS=['#c8f55a','#5af5c8','#f5a623','#f55a5a','#a78bfa','#60a5fa','#f472b6','#34d399'];
+const GOAL_COLORS=['#f5a623','#a78bfa','#60a5fa','#f472b6','#fbbf24','#818cf8','#22d3ee','#fb7185'];
 let selectedGoalColor=GOAL_COLORS[0];
 function renderColorSwatches(){
   const wrap=document.getElementById('goalColorSwatches');
