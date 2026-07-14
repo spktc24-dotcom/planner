@@ -52,14 +52,12 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 
 /* GOALS */
 .goals-empty{text-align:center;color:var(--muted);font-size:12px;padding:20px;border:1px dashed var(--border);border-radius:10px}
-.goal-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.goal-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:12px;transition:background .4s ease}
 .goal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .goal-title{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:var(--accent2)}
 .goal-period{font-size:10px;color:var(--muted);margin-top:3px}
-.goal-progress-row{display:flex;align-items:center;gap:8px;margin:10px 0 8px}
-.goal-progress-bar{flex:1;height:6px;background:#ffffff10;border-radius:4px;overflow:hidden}
-.goal-progress-fill{height:100%;background:var(--accent2);border-radius:4px;transition:width .3s}
-.goal-progress-text{font-size:10px;color:var(--muted);white-space:nowrap;flex-shrink:0}
+.goal-progress-row{margin:10px 0 8px}
+.goal-progress-text{font-size:10px;color:var(--muted);white-space:nowrap}
 .goal-steps{display:flex;flex-direction:column;gap:2px}
 .goal-step{display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0;border-top:1px solid var(--border)}
 .goal-step:first-child{border-top:none}
@@ -71,8 +69,9 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 .goal-actions{display:flex;gap:8px;margin-top:10px}
 .goal-add-step{background:transparent;border:1px dashed var(--border);color:var(--accent2);border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:'Unbounded',sans-serif}
 .goal-add-step:hover{border-color:var(--accent2)}
-.goal-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;flex-shrink:0}
+.goal-del,.goal-edit{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;flex-shrink:0}
 .goal-del:hover{color:var(--danger)}
+.goal-edit:hover{color:var(--accent2)}
 .color-swatches{display:flex;gap:10px;flex-wrap:wrap}
 .color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;flex-shrink:0}
 .color-swatch:hover{transform:scale(1.12)}
@@ -314,7 +313,7 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 <!-- ══ GOAL FORM OVERLAY ══ -->
 <div class="overlay" id="goalFormOverlay">
   <div class="modal">
-    <div class="modal-title">Нова ціль</div>
+    <div class="modal-title" id="goalFormTitle">Нова ціль</div>
     <div class="field"><label>Назва цілі</label><input type="text" id="goalTitle" placeholder="Наприклад: Вивчити англійську"></div>
     <div class="field">
       <label>Період (необов'язково)</label>
@@ -920,17 +919,19 @@ function renderGoalsList(){
         <span class="goal-step-date">${fmtDisplay(s.date)}</span>
       </div>`).join(''):'<div class="goal-step" style="color:var(--muted)">Ще немає кроків</div>';
     return `
-    <div class="goal-card" style="border-left:3px solid ${color}">
+    <div class="goal-card" style="border-left:3px solid ${color};background:linear-gradient(to right, ${color}35 ${pct}%, var(--card) ${pct}%)">
       <div class="goal-head">
         <div>
           <div class="goal-title" style="color:${color}">${esc(g.title)}</div>
           <div class="goal-period">${g.start?fmtDisplay(g.start):''}${g.end?' → '+fmtDisplay(g.end):''}</div>
         </div>
-        <button class="goal-del" onclick="deleteGoal('${g.id}')">✕</button>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="goal-edit" onclick="editGoal('${g.id}')" title="Редагувати">✎</button>
+          <button class="goal-del" onclick="deleteGoal('${g.id}')">✕</button>
+        </div>
       </div>
       <div class="goal-progress-row">
-        <div class="goal-progress-bar"><div class="goal-progress-fill" style="width:${pct}%;background:${color}"></div></div>
-        <div class="goal-progress-text">${done}/${total}</div>
+        <div class="goal-progress-text">${done}/${total} ${total?'('+pct+'%)':''}</div>
       </div>
       <div class="goal-steps">${stepsHtml}</div>
       <div class="goal-actions">
@@ -940,7 +941,11 @@ function renderGoalsList(){
   }).join('');
 }
 
+let editingGoalId=null;
+
 function openGoalForm(){
+  editingGoalId=null;
+  document.getElementById('goalFormTitle').textContent='Нова ціль';
   document.getElementById('goalTitle').value='';
   document.getElementById('goalStart').value='';
   document.getElementById('goalEnd').value='';
@@ -950,16 +955,31 @@ function openGoalForm(){
   document.getElementById('goalFormOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('goalTitle').focus(),120);
 }
-function closeGoalForm(){document.getElementById('goalFormOverlay').classList.remove('open')}
+function editGoal(id){
+  const goal=loadGoals().find(g=>g.id===id);
+  if(!goal)return;
+  editingGoalId=id;
+  document.getElementById('goalFormTitle').textContent='Редагувати ціль';
+  document.getElementById('goalTitle').value=goal.title;
+  document.getElementById('goalStart').value=goal.start||'';
+  document.getElementById('goalEnd').value=goal.end||'';
+  document.getElementById('goalDesc').value=goal.desc||'';
+  selectedGoalColor=goal.color||GOAL_COLORS[0];
+  renderColorSwatches();
+  document.getElementById('goalFormOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('goalTitle').focus(),120);
+}
+function closeGoalForm(){document.getElementById('goalFormOverlay').classList.remove('open');editingGoalId=null}
 function saveGoal(){
   const title=document.getElementById('goalTitle').value.trim();
   if(!title){document.getElementById('goalTitle').focus();return}
   const start=document.getElementById('goalStart').value;
   const end=document.getElementById('goalEnd').value;
   if(start&&end&&start>end){alert('Дата завершення має бути пізніше дати початку!');return}
-  const goal={id:Date.now().toString(),title,start,end,desc:document.getElementById('goalDesc').value.trim(),color:selectedGoalColor};
+  const goal={id:editingGoalId||Date.now().toString(),title,start,end,desc:document.getElementById('goalDesc').value.trim(),color:selectedGoalColor};
   const goals=loadGoals();
-  goals.push(goal);
+  const idx=goals.findIndex(g=>g.id===goal.id);
+  if(idx>=0)goals[idx]=goal; else goals.push(goal);
   saveGoalsList(goals);
   closeGoalForm();
   renderGoalsList();
