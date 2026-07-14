@@ -1463,7 +1463,7 @@ document.addEventListener('click',hideTextTooltip);
 setInterval(()=>{current=new Date();if(selectedDay)renderDayView();renderOverdue()},30000);
 
 // Auto-pull every 30 seconds (only if no operations pending)
-setInterval(autoSync, 30000);
+setInterval(autoSync, 15000);
 
 if(scriptUrl){setSyncStatus('syncing','Завантаження...');syncNow()}
 else setSyncStatus('offline','Офлайн режим');
