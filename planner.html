@@ -93,8 +93,9 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 .day-num{font-family:'Unbounded',sans-serif;font-size:10px;color:var(--muted);margin-bottom:3px}
 .day-cell.today .day-num{color:var(--accent);font-weight:700}
 .dot-row{display:flex;flex-wrap:wrap;gap:2px}
-.dot{width:5px;height:5px;border-radius:50%;background:var(--accent2);flex-shrink:0}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--accent2);flex-shrink:0;transition:opacity .25s}
 .dot.high{background:var(--danger)}.dot.mid{background:var(--accent)}
+.dot.done{opacity:.3}
 
 /* PAST BANNER */
 .past-banner{background:#f5a62318;border:1px solid #f5a62355;border-radius:10px;padding:10px 14px;font-size:12px;color:var(--warn);margin-bottom:14px;display:none}
