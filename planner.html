@@ -28,6 +28,16 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 .setup-btn{background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:20px;padding:4px 12px;font-size:10px;font-family:'Unbounded',sans-serif;cursor:pointer;transition:background .2s}
 .setup-btn:hover{background:#c8f55a18}
 
+/* OVERDUE PANEL */
+.overdue-panel{display:none;background:#f55a5a12;border:1px solid #f55a5a44;border-radius:14px;padding:14px 16px;margin-bottom:18px}
+.overdue-panel.show{display:block}
+.overdue-title{display:flex;align-items:center;gap:8px;font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;color:var(--danger);letter-spacing:.5px}
+.overdue-count{background:var(--danger);color:#fff;border-radius:20px;padding:1px 8px;font-size:10px}
+.overdue-item{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-top:1px solid #f55a5a22}
+.overdue-item:first-child{border-top:none;padding-top:10px}
+.overdue-item .task-body{cursor:pointer}
+.overdue-item .task-meta span{margin-right:8px}
+
 /* HEADER */
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px}
 .month-nav{display:flex;align-items:center;gap:10px}
@@ -128,6 +138,10 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 .field input,.field textarea,.field select{width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px 12px;font-family:'Jost',sans-serif;font-size:14px;outline:none;transition:border-color .2s;resize:none}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent2)}
 .field input:disabled{opacity:.4;cursor:not-allowed}
+.field input[type="time"]::-webkit-calendar-picker-indicator,
+.field input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(1);cursor:pointer;opacity:.8}
+.field input[type="time"]::-webkit-calendar-picker-indicator:hover,
+.field input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 .field select option{background:var(--card)}
 .time-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
 .time-sep{color:var(--muted);font-size:18px;text-align:center}
@@ -143,6 +157,32 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
 .btn-save:disabled{opacity:.35;cursor:not-allowed}
 .btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger);border-radius:10px;padding:8px 14px;cursor:pointer;font-family:'Unbounded',sans-serif;font-size:10px;transition:background .2s;width:100%;margin-top:10px}
 .btn-danger:hover{background:#f55a5a18}
+
+/* MULTI-DATE PICKER */
+.date-field{position:relative}
+.date-input-btn{width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px 12px;font-family:'Jost',sans-serif;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:border-color .2s}
+.date-input-btn:hover{border-color:var(--accent2)}
+.date-input-btn .ph{color:var(--muted)}
+.date-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.date-chip{display:inline-flex;align-items:center;gap:6px;background:#5af5c81a;border:1px solid #5af5c855;color:var(--accent2);border-radius:20px;padding:4px 6px 4px 10px;font-size:11px;font-family:'Unbounded',sans-serif}
+.date-chip button{background:none;border:none;color:inherit;cursor:pointer;font-size:12px;padding:0 2px;line-height:1}
+.date-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;z-index:50;box-shadow:0 12px 32px #0008}
+.date-dropdown.open{display:block}
+.dp-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.dp-nav button{background:var(--card);border:1px solid var(--border);color:var(--accent);width:28px;height:28px;border-radius:50%;cursor:pointer}
+.dp-title{font-family:'Unbounded',sans-serif;font-size:11px;color:var(--accent);text-transform:uppercase}
+.dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.dp-dow{text-align:center;font-size:8px;color:var(--muted);padding:2px 0;font-family:'Unbounded',sans-serif}
+.dp-cell{text-align:center;font-size:12px;padding:6px 0;border-radius:6px;cursor:pointer;border:1px solid transparent}
+.dp-cell:hover:not(.dp-disabled):not(.dp-empty){border-color:var(--accent)}
+.dp-cell.dp-selected{background:var(--accent2);color:#0d0d0f;font-weight:700}
+.dp-cell.dp-today{border-color:var(--accent)}
+.dp-cell.dp-disabled{opacity:.3;cursor:not-allowed}
+.dp-cell.dp-empty{cursor:default}
+.dp-foot{display:flex;justify-content:space-between;gap:6px;margin-top:10px;flex-wrap:wrap}
+.dp-foot button{background:none;border:none;color:var(--muted);font-size:10px;cursor:pointer;font-family:'Unbounded',sans-serif;padding:4px 2px}
+.dp-foot button:hover{color:var(--text)}
+.dp-foot button:last-child{color:var(--accent);margin-left:auto}
 
 /* SETUP STEPS */
 .step{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
@@ -167,6 +207,12 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-w
   <div class="sync-status offline" id="syncStatus"><span class="sync-dot"></span><span id="syncText">Офлайн режим</span></div>
   <button class="sync-btn" id="syncNowBtn" onclick="syncNow()" style="display:none">↻ Синхронізувати</button>
   <button class="setup-btn" onclick="openSetup()">⚙ Синхронізація</button>
+</div>
+
+<!-- OVERDUE PANEL -->
+<div class="overdue-panel" id="overduePanel">
+  <div class="overdue-title">⚠ Невиконані завдання <span class="overdue-count" id="overdueCount">0</span></div>
+  <div id="overdueList"></div>
 </div>
 
 <!-- HEADER -->
@@ -337,7 +383,27 @@ function doPost(e) { return handle(e); }</div>
 <div class="overlay" id="overlay">
   <div class="modal">
     <div class="modal-title" id="modalTitle">Новий запис</div>
-    <div class="field"><label>Дата</label><input type="date" id="taskDate" onchange="onDateChange()"></div>
+    <div class="field date-field">
+      <label>Дата (можна обрати кілька днів)</label>
+      <div class="date-input-btn" id="dateInputBtn" onclick="toggleDatePicker()">
+        <span class="ph" id="dateInputText">Виберіть дату</span>
+        <span>▾</span>
+      </div>
+      <div class="date-chips" id="dateChips"></div>
+      <div class="date-dropdown" id="dateDropdown">
+        <div class="dp-nav">
+          <button type="button" onclick="dpChangeMonth(-1)">&#8249;</button>
+          <span class="dp-title" id="dpTitle">-</span>
+          <button type="button" onclick="dpChangeMonth(1)">&#8250;</button>
+        </div>
+        <div class="dp-grid" id="dpGrid"></div>
+        <div class="dp-foot">
+          <button type="button" onclick="clearSelectedDates()">Очистити</button>
+          <button type="button" onclick="selectTodayOnly()">Сьогодні</button>
+          <button type="button" onclick="closeDatePicker()">Готово ✓</button>
+        </div>
+      </div>
+    </div>
     <div class="warn-msg" id="warnMsg"></div>
     <div class="field" id="timeField">
       <label>Час початку → кінця (необов'язково)</label>
@@ -374,6 +440,7 @@ let current=new Date();
 let viewYear=current.getFullYear(), viewMonth=current.getMonth(), selectedDay=null;
 let scriptUrl=localStorage.getItem('gs_script_url')||'https://script.google.com/macros/s/AKfycby8BeC2NxNhXjfbHvBTthQ-e7R0O6oUeq0wbrcQ5IToWnUcQwr_cVfDK-u7PkJ7HNY8/exec';
 let syncQueue=[];
+let selectedDates=[],dpYear=0,dpMonth=0;
 
 // ══════════════════════════════════════════
 // DATE HELPERS
@@ -577,7 +644,60 @@ function changeMonth(dir){
 }
 function render(){
   document.getElementById('monthTitle').textContent=MONTHS_UA[viewMonth]+' '+viewYear;
-  renderCalendar();renderDayView();renderStats();
+  renderCalendar();renderDayView();renderStats();renderOverdue();
+}
+
+// ══════════════════════════════════════════
+// OVERDUE TASKS
+// ══════════════════════════════════════════
+function isOverdueTask(t){
+  if(t.done)return false;
+  return isPastDate(t.date)||isTodayDate(t.date);
+}
+function getOverdueTasks(){
+  const list=[];
+  for(let y=2024;y<=2028;y++)for(let m=0;m<12;m++){
+    loadTasks(y,m).forEach(t=>{if(isOverdueTask(t))list.push(t)});
+  }
+  list.sort((a,b)=>{
+    if(a.date!==b.date)return a.date<b.date?-1:1;
+    return t2m(a.timeStart)-t2m(b.timeStart)||0;
+  });
+  return list;
+}
+function renderOverdue(){
+  const tasks=getOverdueTasks();
+  const panel=document.getElementById('overduePanel');
+  if(!tasks.length){panel.classList.remove('show');return}
+  panel.classList.add('show');
+  document.getElementById('overdueCount').textContent=tasks.length;
+  document.getElementById('overdueList').innerHTML=tasks.map(t=>`
+    <div class="overdue-item">
+      <div class="task-check" onclick="toggleTaskByDate('${t.id}','${t.date}')"></div>
+      <div class="task-body" onclick="jumpToDate('${t.date}')">
+        <div class="task-text">${esc(t.text)}</div>
+        <div class="task-meta">
+          <span class="priority-badge p-${t.priority}">${t.priority==='high'?'Важливо':t.priority==='mid'?'Середнє':'Низьке'}</span>
+          <span>${fmtDisplay(t.date)}${t.timeStart?' · '+t.timeStart+'–'+t.timeEnd:''}</span>
+        </div>
+      </div>
+      <button class="task-del" onclick="deleteTask('${t.id}')">✕</button>
+    </div>`).join('');
+}
+function toggleTaskByDate(id,date){
+  const pts=date.split('-').map(Number);
+  const y=pts[0],m=pts[1]-1;
+  const tasks=loadTasks(y,m);
+  const item=tasks.find(x=>x.id===id);
+  if(!item)return;
+  item.done=!item.done;saveTasks(tasks,y,m);
+  render();
+  pushTask(item);
+}
+function jumpToDate(date){
+  const pts=date.split('-').map(Number);
+  viewYear=pts[0];viewMonth=pts[1]-1;selectedDay=pts[2];
+  render();
 }
 function renderCalendar(){
   const cal=document.getElementById('calendar');
@@ -735,7 +855,10 @@ function openModal(){
   const isPast=isPastDate(ds);
   if(isPast)return; // extra guard
 
-  document.getElementById('taskDate').value=ds;
+  selectedDates=[ds];
+  const pts=ds.split('-').map(Number);
+  dpYear=pts[0];dpMonth=pts[1]-1;
+
   document.getElementById('taskTimeStart').value='';
   document.getElementById('taskTimeEnd').value='';
   document.getElementById('taskText').value='';
@@ -744,27 +867,92 @@ function openModal(){
   document.getElementById('warnMsg').classList.remove('show');
   document.getElementById('warnMsg').textContent='';
 
-  // set min date = today
-  document.getElementById('taskDate').min=todayStr();
-
-  updateModalDateState(ds);
+  renderDateChips();
+  renderDatePicker();
+  updateModalDateState();
   document.getElementById('overlay').classList.add('open');
   setTimeout(()=>document.getElementById('taskText').focus(),120);
 }
-function closeModal(){document.getElementById('overlay').classList.remove('open')}
+function closeModal(){document.getElementById('overlay').classList.remove('open');closeDatePicker()}
 
-function onDateChange(){
-  const ds=document.getElementById('taskDate').value;
-  updateModalDateState(ds);
+// ── multi-date picker ──
+function toggleDatePicker(){document.getElementById('dateDropdown').classList.toggle('open')}
+function closeDatePicker(){document.getElementById('dateDropdown').classList.remove('open')}
+function dpChangeMonth(dir){
+  dpMonth+=dir;
+  if(dpMonth>11){dpMonth=0;dpYear++}
+  if(dpMonth<0){dpMonth=11;dpYear--}
+  renderDatePicker();
+}
+function renderDatePicker(){
+  document.getElementById('dpTitle').textContent=MONTHS_UA[dpMonth]+' '+dpYear;
+  const grid=document.getElementById('dpGrid');
+  grid.innerHTML='';
+  ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].forEach(dw=>{
+    const e=document.createElement('div');e.className='dp-dow';e.textContent=dw;grid.appendChild(e);
+  });
+  const fd=new Date(dpYear,dpMonth,1).getDay();
+  const off=(fd===0)?6:fd-1;
+  const dim=new Date(dpYear,dpMonth+1,0).getDate();
+  for(let i=0;i<off;i++){const e=document.createElement('div');e.className='dp-cell dp-empty';grid.appendChild(e)}
+  for(let d=1;d<=dim;d++){
+    const ds=dateStr(dpYear,dpMonth,d);
+    const past=isPastDate(ds),today=isTodayDate(ds),sel=selectedDates.includes(ds);
+    const cell=document.createElement('div');
+    cell.className='dp-cell'+(past?' dp-disabled':'')+(today?' dp-today':'')+(sel?' dp-selected':'');
+    cell.textContent=d;
+    if(!past)cell.onclick=(e)=>{e.stopPropagation();toggleDateSelection(ds)};
+    grid.appendChild(cell);
+  }
+}
+function toggleDateSelection(ds){
+  const i=selectedDates.indexOf(ds);
+  if(i>=0){
+    if(selectedDates.length===1)return; // keep at least one date
+    selectedDates.splice(i,1);
+  } else {
+    selectedDates.push(ds);
+  }
+  selectedDates.sort();
+  renderDateChips();renderDatePicker();updateModalDateState();
+}
+function clearSelectedDates(){
+  selectedDates=[];
+  renderDateChips();renderDatePicker();updateModalDateState();
+}
+function selectTodayOnly(){
+  selectedDates=[todayStr()];
+  const pts=todayStr().split('-').map(Number);
+  dpYear=pts[0];dpMonth=pts[1]-1;
+  renderDateChips();renderDatePicker();updateModalDateState();
+}
+function removeDate(ds){
+  if(selectedDates.length===1)return;
+  selectedDates=selectedDates.filter(x=>x!==ds);
+  renderDateChips();renderDatePicker();updateModalDateState();
+}
+function fmtDisplay(ds){const p=ds.split('-');return p[2]+'.'+p[1]+'.'+p[0]}
+function renderDateChips(){
+  const wrap=document.getElementById('dateChips');
+  const btnText=document.getElementById('dateInputText');
+  if(!selectedDates.length){
+    btnText.textContent='Виберіть дату';btnText.classList.add('ph');
+    wrap.innerHTML='';return;
+  }
+  btnText.classList.remove('ph');
+  btnText.textContent=selectedDates.length===1?fmtDisplay(selectedDates[0]):selectedDates.length+' дати обрано';
+  wrap.innerHTML=selectedDates.map(ds=>
+    '<span class="date-chip">'+fmtDisplay(ds)+(selectedDates.length>1?'<button type="button" onclick="removeDate(\''+ds+'\')">✕</button>':'')+'</span>'
+  ).join('');
 }
 
-function updateModalDateState(ds){
-  const isPast=ds&&isPastDate(ds);
+function updateModalDateState(){
   const warn=document.getElementById('warnMsg');
   const saveBtn=document.getElementById('modalSaveBtn');
+  const invalid=!selectedDates.length||selectedDates.some(isPastDate);
 
-  if(isPast){
-    warn.textContent='⚠ Ця дата вже минула. Виберіть сьогодні або майбутній день.';
+  if(invalid){
+    warn.textContent=selectedDates.length?'⚠ Одна з обраних дат вже минула.':'⚠ Оберіть хоча б одну дату.';
     warn.classList.add('show');
     saveBtn.disabled=true;
     document.getElementById('taskTimeStart').disabled=true;
@@ -780,7 +968,6 @@ function updateModalDateState(ds){
 
 function onTimeChange(){
   const s=document.getElementById('taskTimeStart').value;
-  const date=document.getElementById('taskDate').value;
   if(s&&!document.getElementById('taskTimeEnd').value){
     document.getElementById('taskTimeEnd').value=m2t(Math.min(t2m(s)+60,23*60));
   }
@@ -788,59 +975,72 @@ function onTimeChange(){
   const warn=document.getElementById('warnMsg');
   const conflict=document.getElementById('conflictMsg');
 
-  // Check if time is in the past (today only)
-  if(date&&isTodayDate(date)&&s&&t2m(s)<nowMinutes()){
+  // Check if time is in the past (only matters if today is among selected dates)
+  if(s&&selectedDates.includes(todayStr())&&t2m(s)<nowMinutes()){
     warn.textContent='⚠ Час '+s+' вже минув сьогодні. Виберіть пізніший час.';
     warn.classList.add('show');
     document.getElementById('modalSaveBtn').disabled=true;
     conflict.classList.remove('show');
     return;
-  } else if(!isPastDate(date)){
+  } else if(selectedDates.length&&!selectedDates.some(isPastDate)){
     warn.classList.remove('show');
     document.getElementById('modalSaveBtn').disabled=false;
   }
 
-  // Conflict check
-  if(!s||!date||!te){conflict.classList.remove('show');return}
-  const pts=date.split('-').map(Number);
-  const dt=loadTasks(pts[0],pts[1]-1).filter(t=>t.date===date);
-  hasConflict(dt,s,te)?conflict.classList.add('show'):conflict.classList.remove('show');
+  // Conflict check across all selected dates
+  if(!s||!te){conflict.classList.remove('show');return}
+  const anyConflict=selectedDates.some(date=>{
+    const pts=date.split('-').map(Number);
+    const dt=loadTasks(pts[0],pts[1]-1).filter(t=>t.date===date);
+    return hasConflict(dt,s,te);
+  });
+  anyConflict?conflict.classList.add('show'):conflict.classList.remove('show');
 }
 
 async function saveTask(){
-  const date=document.getElementById('taskDate').value;
   const text=document.getElementById('taskText').value.trim();
   const ts=document.getElementById('taskTimeStart').value;
   const te=document.getElementById('taskTimeEnd').value;
 
   if(!text){document.getElementById('taskText').focus();return}
-  if(!date)return;
-  if(isPastDate(date)){alert('Неможливо зберегти запис у минулому!');return}
+  if(!selectedDates.length)return;
+  if(selectedDates.some(isPastDate)){alert('Неможливо зберегти запис у минулому!');return}
   if(ts&&te&&t2m(ts)>=t2m(te)){alert('Час початку має бути раніше кінця!');return}
-  if(ts&&isTodayDate(date)&&t2m(ts)<nowMinutes()){alert('Час '+ts+' вже минув. Виберіть майбутній час.');return}
+  if(ts&&selectedDates.includes(todayStr())&&t2m(ts)<nowMinutes()){alert('Час '+ts+' вже минув. Виберіть майбутній час.');return}
 
-  const pts=date.split('-').map(Number);
-  const y=pts[0],m=pts[1]-1,d=pts[2];
-  const tasks=loadTasks(y,m);
-  if(ts&&te&&hasConflict(tasks.filter(t=>t.date===date),ts,te)){
-    if(!confirm('Час перетинається з іншим записом. Все одно зберегти?'))return;
+  if(ts&&te){
+    const conflictDates=selectedDates.filter(date=>{
+      const pts=date.split('-').map(Number);
+      const dt=loadTasks(pts[0],pts[1]-1).filter(t=>t.date===date);
+      return hasConflict(dt,ts,te);
+    });
+    if(conflictDates.length&&!confirm('Час перетинається з іншим записом на: '+conflictDates.map(fmtDisplay).join(', ')+'. Все одно зберегти?'))return;
   }
-  const task={id:Date.now().toString(),date,timeStart:ts,timeEnd:te,text,priority:document.getElementById('taskPriority').value,done:false};
-  tasks.push(task);saveTasks(tasks,y,m);
-  viewYear=y;viewMonth=m;selectedDay=d;
+
+  const priority=document.getElementById('taskPriority').value;
+  let lastY,lastM,lastD;
+  selectedDates.forEach((date,idx)=>{
+    const pts=date.split('-').map(Number);
+    const y=pts[0],m=pts[1]-1,d=pts[2];
+    const tasks=loadTasks(y,m);
+    const task={id:Date.now().toString()+'_'+idx,date,timeStart:ts,timeEnd:te,text,priority,done:false};
+    tasks.push(task);saveTasks(tasks,y,m);
+    pushTask(task);
+    lastY=y;lastM=m;lastD=d;
+  });
+  viewYear=lastY;viewMonth=lastM;selectedDay=lastD;
   closeModal();render();
-  pushTask(task);
 }
 
 function toggleTask(id){
   const tasks=loadTasks();const item=tasks.find(x=>x.id===id);
   if(!item)return;
   item.done=!item.done;saveTasks(tasks);
-  renderDayView();renderStats();renderCalendar();
+  renderDayView();renderStats();renderCalendar();renderOverdue();
   pushTask(item);
 }
 function deleteTask(id){
-  deleteTaskLocal(id);renderDayView();renderStats();renderCalendar();
+  deleteTaskLocal(id);renderDayView();renderStats();renderCalendar();renderOverdue();
   pushDelete(id);
 }
 
@@ -848,13 +1048,14 @@ function deleteTask(id){
 // INIT
 // ══════════════════════════════════════════
 document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeModal()});
+document.querySelector('#overlay .modal').addEventListener('click',function(e){if(!e.target.closest('.date-field'))closeDatePicker()});
 document.getElementById('setupOverlay').addEventListener('click',function(e){if(e.target===this)closeSetup()});
 document.addEventListener('keydown',e=>{
   const anyOpen=document.querySelector('.overlay.open');
   if(!anyOpen&&(e.key==='n'||e.key==='N')){const ds=selectedDay?fmt(selectedDay):todayStr();if(!isPastDate(ds))openModal()}
   if(e.key==='Escape'){closeModal();closeSetup()}
 });
-setInterval(()=>{current=new Date();if(selectedDay)renderDayView()},30000);
+setInterval(()=>{current=new Date();if(selectedDay)renderDayView();renderOverdue()},30000);
 
 // Auto-pull every 30 seconds (only if no operations pending)
 setInterval(autoSync, 30000);
