@@ -575,6 +575,8 @@ let viewYear=current.getFullYear(), viewMonth=current.getMonth(), selectedDay=nu
 let scriptUrl=localStorage.getItem('gs_script_url')||'https://script.google.com/macros/s/AKfycby8BeC2NxNhXjfbHvBTthQ-e7R0O6oUeq0wbrcQ5IToWnUcQwr_cVfDK-u7PkJ7HNY8/exec';
 let syncQueue=[];
 let goalSyncQueue=[];
+let pendingTaskIds=new Set();
+let pendingDeleteIds=new Set();
 let selectedDates=[],dpYear=0,dpMonth=0;
 let currentGoalId=null;
 let editingTaskId=null;
@@ -674,10 +676,18 @@ async function pullFromSheets(){
   const res=await apiCall({action:'getAll'});
   console.log('[PULL] отримано з Sheets:', res.tasks ? res.tasks.length : 0, 'записів', res.tasks);
   if(res.ok&&res.tasks){
+    // записи, які прямо зараз відправляються — не даємо застарілому pull їх перезаписати
+    const preserved=[];
+    if(pendingTaskIds.size){
+      for(let y=2024;y<=2028;y++)for(let m=0;m<12;m++){
+        loadTasks(y,m).forEach(t=>{if(pendingTaskIds.has(t.id))preserved.push(t)});
+      }
+    }
     for(let y=2024;y<=2028;y++)for(let m=0;m<12;m++){
       localStorage.removeItem('planner_'+y+'_'+m);
     }
-    res.tasks.forEach(t=>saveTaskLocal(t));
+    res.tasks.forEach(t=>{if(!pendingTaskIds.has(t.id)&&!pendingDeleteIds.has(t.id))saveTaskLocal(t)});
+    preserved.forEach(t=>saveTaskLocal(t));
     const n=new Date();
     setSyncStatus('ok','↻ '+n.getHours()+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0'));
     render();
@@ -722,7 +732,8 @@ async function syncNow(){
 
 // Зберегти один запис — додається в чергу
 function pushTask(task){
-  if(!scriptUrl){syncQueue.push({type:'save',task});return;}
+  pendingTaskIds.add(task.id);
+  if(!scriptUrl){syncQueue.push({type:'save',task});pendingTaskIds.delete(task.id);return;}
   enqueue(async()=>{
     try{
       console.log('[PUSH] зберігаю в Sheets:', task.id, task.text);
@@ -733,16 +744,20 @@ function pushTask(task){
       console.error('[PUSH] помилка:', e);
       syncQueue.push({type:'save',task});
       setSyncStatus('err','Офлайн — збережено локально');
+    }finally{
+      pendingTaskIds.delete(task.id);
     }
   });
 }
 
 // Видалити запис — додається в чергу
 function pushDelete(id){
-  if(!scriptUrl){syncQueue.push({type:'delete',id});return;}
+  pendingDeleteIds.add(id);
+  if(!scriptUrl){syncQueue.push({type:'delete',id});pendingDeleteIds.delete(id);return;}
   enqueue(async()=>{
     try{ await apiCall({action:'delete',id}); }
     catch{ syncQueue.push({type:'delete',id}); }
+    finally{ pendingDeleteIds.delete(id); }
   });
 }
 
@@ -1463,7 +1478,7 @@ document.addEventListener('click',hideTextTooltip);
 setInterval(()=>{current=new Date();if(selectedDay)renderDayView();renderOverdue()},30000);
 
 // Auto-pull every 30 seconds (only if no operations pending)
-setInterval(autoSync, 15000);
+setInterval(autoSync, 8000);
 
 if(scriptUrl){setSyncStatus('syncing','Завантаження...');syncNow()}
 else setSyncStatus('offline','Офлайн режим');
