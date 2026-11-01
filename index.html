@@ -154,6 +154,16 @@ h1.title{font-family:var(--serif);font-weight:600;font-size:clamp(34px,4.6vw,52p
 .mini-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:inline-flex;flex-shrink:0}
 .mini-btn:hover{color:var(--accent);background:var(--accent-soft)}
 .mini-btn .ico{width:14px;height:14px}
+.info-btn{opacity:.6}
+.info-btn:hover{opacity:1}
+.ti-text{font-size:17px;line-height:1.5;white-space:pre-wrap;word-break:break-word;margin:6px 0 16px}
+.trow.done .ti-text,.ti-text.done{text-decoration:line-through;color:var(--muted)}
+.ti-rows{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;font-size:13.5px;padding:14px 0 4px;border-top:1px solid var(--line)}
+.ti-rows dt{color:var(--muted)}
+.ti-rows dd{margin:0;word-break:break-word}
+.ti-rows dd small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.ti-quad{display:inline-flex;align-items:center;gap:6px;color:var(--qc);font-weight:600}
+.ti-quad .ico{width:15px;height:15px}
 .add-row{margin-top:14px;width:100%;display:flex;align-items:center;gap:12px;border:1.5px dashed var(--border);background:transparent;border-radius:14px;padding:15px 18px;color:var(--muted);cursor:pointer;font-size:14px;text-align:left}
 .add-row:hover{border-color:var(--accent);color:var(--accent)}
 
@@ -668,6 +678,20 @@ mark{background:color-mix(in srgb,var(--q-delegate) 32%,transparent);color:inher
 
 <div class="text-tooltip" id="textTooltip"></div>
 
+<!-- ══ TASK INFO ══ -->
+<div class="overlay" id="taskInfoOverlay" onclick="if(event.target===this)closeTaskInfo()">
+  <div class="modal">
+    <div class="modal-title">Завдання</div>
+    <div class="ti-text" id="tiText"></div>
+    <dl class="ti-rows" id="tiRows"></dl>
+    <div class="modal-actions">
+      <button class="btn" id="tiDone" style="white-space:nowrap"></button>
+      <button class="btn" id="tiEdit"><span data-ico="edit"></span>Редагувати</button>
+      <button class="btn btn-primary" onclick="closeTaskInfo()">Закрити</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ NOTE EDITOR ══ -->
 <div class="overlay" id="noteOverlay">
   <div class="modal wide">
@@ -1006,6 +1030,7 @@ const ICONS={
   edit:'<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
   x:'<path d="M18 6 6 18M6 6l12 12"/>',
   bulb:'<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.74V16a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-1.26A7 7 0 0 0 12 2z"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   pin:'<path d="M12 17v5"/><path d="M9 3h6l-1 6 3 3v2H7v-2l3-3z"/>'
 };
 function ico(n){return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">'+(ICONS[n]||'')+'</svg>'}
@@ -1537,6 +1562,7 @@ function taskRow(t,o={}){
     <span class="trow-text" onclick="editTask('${t.id}','${t.date}')" title="${esc(t.text)}">${esc(t.text)}</span>
     ${o.noTag?'':taskTag(t)}
     <span class="trow-time">${time}</span>
+    <button class="mini-btn info-btn" onclick="showTaskInfo('${t.id}','${t.date}')" title="Переглянути повністю">${ico('eye')}</button>
     <span class="trow-act"><button class="mini-btn" onclick="deleteTask('${t.id}')" title="Видалити">${ico('x')}</button></span>
   </div>`;
 }
@@ -1609,6 +1635,7 @@ function renderMatrix(id,limit,includePast){
         <button class="check" onclick="toggleTaskByDate('${t.id}','${t.date}')" title="Виконано"></button>
         <span class="trow-text" onclick="editTask('${t.id}','${t.date}')" title="${esc(t.text)}">${esc(t.text)}</span>
         <span class="qwhen">${quadWhen(t)}</span>
+        <button class="mini-btn info-btn" onclick="showTaskInfo('${t.id}','${t.date}')" title="Переглянути повністю">${ico('eye')}</button>
       </div>`).join('');
     const more=items.length>limit
       ?`<button class="quad-more" onclick="toggleQuad('${id}','${key}')">${expanded?'Згорнути':'Ще '+(items.length-limit)}</button>`:'';
@@ -1756,7 +1783,7 @@ function renderGoalCards(){
   el.innerHTML=goals.slice(0,3).map(g=>{
     const c=g.color||GOAL_COLORS[0],s=goalStats(g);
     return `<div class="card gcard" style="--gc:${c}" onclick="go('goals')">
-      <div class="gcard-head"><div class="gicon">${ico('target')}</div><div class="gname">${esc(g.title)}</div></div>
+      <div class="gcard-head"><div class="gicon">${ico('target')}</div><div class="gname" title="${esc(g.title)}">${esc(g.title)}</div></div>
       <div class="gmeta">${s.done} / ${s.total} ${plural(s.total,'крок','кроки','кроків')}</div>
       <div class="gbar"><div class="gbar-track"><div class="gbar-fill" style="width:${s.pct}%"></div></div><span>${s.pct}%</span></div>
     </div>`;
@@ -1949,7 +1976,7 @@ function renderTimeline(tasks,ds,isPast,isToday){
     const block=document.createElement('div');
     block.className='booked-block'+(t.done?' done':'')+(taskPast&&!t.done?' past-task':'');
     block.style.cssText='top:'+topPx+'px;height:'+h+'px;left:50px;right:6px;'+qvars(t.priority);
-    block.innerHTML='<div class="bb-inner"><button class="check'+(t.done?' on':'')+'" onclick="toggleTask(\''+t.id+'\')" title="Позначити виконаним"></button><span class="bb-text">'+esc(t.text)+'</span><span class="bb-time">'+t.timeStart+'–'+t.timeEnd+' · '+durTxt+'</span><button class="mini-btn" onclick="editTask(\''+t.id+'\',\''+t.date+'\')" title="Редагувати">'+ico('edit')+'</button><button class="mini-btn" onclick="deleteTask(\''+t.id+'\')" title="Видалити">'+ico('x')+'</button></div>';
+    block.innerHTML='<div class="bb-inner"><button class="check'+(t.done?' on':'')+'" onclick="toggleTask(\''+t.id+'\')" title="Позначити виконаним"></button><span class="bb-text">'+esc(t.text)+'</span><span class="bb-time">'+t.timeStart+'–'+t.timeEnd+' · '+durTxt+'</span><button class="mini-btn info-btn" onclick="showTaskInfo(\''+t.id+'\',\''+t.date+'\')" title="Переглянути повністю">'+ico('eye')+'</button><button class="mini-btn" onclick="editTask(\''+t.id+'\',\''+t.date+'\')" title="Редагувати">'+ico('edit')+'</button><button class="mini-btn" onclick="deleteTask(\''+t.id+'\')" title="Видалити">'+ico('x')+'</button></div>';
     block.querySelector('.bb-text').onclick=(e)=>{e.stopPropagation();showTextTooltip(e,t.text)};
     tl.appendChild(block);
   });
@@ -2018,6 +2045,31 @@ function closeModal(){
   editingTaskId=null;
   currentGoalId=null;
 }
+
+// перегляд завдання повністю (довгий текст і назва цілі не обрізаються)
+function showTaskInfo(id,date){
+  const pts=date.split('-').map(Number);
+  const t=loadTasks(pts[0],pts[1]-1).find(x=>x.id===id);
+  if(!t)return;
+  const q=QUADS[t.priority]||QUADS.plan;
+  const g=t.goalId&&loadGoals().find(x=>x.id===t.goalId);
+  const txt=document.getElementById('tiText');
+  txt.textContent=t.text;txt.classList.toggle('done',!!t.done);
+  const time=t.timeStart?t.timeStart+(t.timeEnd?' – '+t.timeEnd:''):'Без часу';
+  const state=t.done?'Виконано':(isPastDate(t.date)?'<span style="color:var(--danger)">Прострочено</span>':'Заплановано');
+  document.getElementById('tiRows').innerHTML=
+    '<dt>Категорія</dt><dd><span class="ti-quad" style="'+qvars(t.priority)+'">'+ico(q.icon)+q.title+'</span><small>'+q.hint+'</small></dd>'+
+    (g?'<dt>Ціль</dt><dd style="color:'+(g.color||GOAL_COLORS[0])+';font-weight:600">'+esc(g.title)+'</dd>':'')+
+    '<dt>Дата</dt><dd>'+fmtLong(t.date)+' '+pts[0]+'</dd>'+
+    '<dt>Час</dt><dd>'+time+'</dd>'+
+    '<dt>Стан</dt><dd>'+state+'</dd>';
+  const done=document.getElementById('tiDone');
+  done.innerHTML=ico('check')+(t.done?'Не виконано':'Виконано');
+  done.onclick=()=>{toggleTaskByDate(id,date);showTaskInfo(id,date)};
+  document.getElementById('tiEdit').onclick=()=>{closeTaskInfo();editTask(id,date)};
+  document.getElementById('taskInfoOverlay').classList.add('open');
+}
+function closeTaskInfo(){document.getElementById('taskInfoOverlay').classList.remove('open')}
 
 function editTask(id,date){
   const pts=date.split('-').map(Number);
@@ -2248,7 +2300,7 @@ document.addEventListener('keydown',e=>{
   const anyOpen=document.querySelector('.overlay.open');
   const typing=/INPUT|TEXTAREA/.test(document.activeElement?.tagName||'');
   if(!anyOpen&&!typing&&(e.key==='n'||e.key==='N'))openModal();
-  if(e.key==='Escape'){closeModal();closeSetup();closeGoalForm();closeNote();hideTextTooltip()}
+  if(e.key==='Escape'){closeTaskInfo();closeModal();closeSetup();closeGoalForm();closeNote();hideTextTooltip()}
 });
 document.addEventListener('click',hideTextTooltip);
 setInterval(()=>{current=new Date();render()},30000);
