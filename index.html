@@ -407,9 +407,9 @@ mark{background:color-mix(in srgb,var(--q-delegate) 32%,transparent);color:inher
 
 /* ══ BOTTOM NAV (mobile) ══ */
 .bottom-nav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--side);border-top:1px solid var(--border);padding:6px 2px calc(6px + env(safe-area-inset-bottom));justify-content:space-around}
-.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--muted);text-decoration:none;padding:4px 0;flex:1;min-width:0;white-space:nowrap;overflow:hidden}
+.bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;color:var(--muted);text-decoration:none;padding:4px 0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bottom-nav a.active{color:var(--accent);font-weight:600}
-.bottom-nav .ico{width:22px;height:22px}
+.bottom-nav .ico{width:21px;height:21px}
 
 /* ══ RESPONSIVE ══ */
 @media(max-width:1180px){
@@ -490,7 +490,6 @@ mark{background:color-mix(in srgb,var(--q-delegate) 32%,transparent);color:inher
       <div class="top-actions">
         <button class="sync-pill offline" id="syncStatus" onclick="syncNow()" title="Синхронізувати зараз"><span class="dot"></span><span id="syncText">Офлайн режим</span></button>
         <button class="icon-btn theme-toggle" onclick="toggleTheme()" title="Змінити тему"></button>
-        <a class="icon-btn only-mobile" href="#analytics" data-ico="chart" title="Аналітика"></a>
         <a class="icon-btn only-mobile" href="#settings" data-ico="settings" title="Налаштування"></a>
       </div>
     </div>
@@ -674,6 +673,7 @@ mark{background:color-mix(in srgb,var(--q-delegate) 32%,transparent);color:inher
   <a href="#matrix" data-nav="matrix" data-ico="grid"><span>Матриця</span></a>
   <a href="#notes" data-nav="notes" data-ico="bulb"><span>Думки</span></a>
   <a href="#goals" data-nav="goals" data-ico="target"><span>Цілі</span></a>
+  <a href="#analytics" data-nav="analytics" data-ico="chart"><span>Аналітика</span></a>
 </nav>
 
 <div class="text-tooltip" id="textTooltip"></div>
