@@ -1587,12 +1587,30 @@ function importQuotesFromHash(){
   }catch{return null}
 }
 function useQuotes(d){QUOTES=(d.quotes||[]).filter(q=>q&&q.t);renderQuote()}
+// полиця на Cloudflare підключає планувальник посиланням #qsrc=<адреса її /api/quotes з ключем>; далі цитати беруться звідти щоразу
+function quoteFeed(){
+  const h=location.hash;
+  if(h.startsWith('#qsrc=')){
+    const u=decodeURIComponent(h.slice(6));
+    history.replaceState(null,'',location.pathname+location.search+'#plan');
+    if(/^https:\/\/[^/]+\/api\/quotes\?k=\w+$/.test(u)){try{localStorage.setItem('planner_quote_src',u)}catch{}return {url:u,fresh:true}}
+  }
+  try{const u=localStorage.getItem('planner_quote_src');return u?{url:u,fresh:false}:null}catch{return null}
+}
 async function loadQuotes(){
-  const imported=importQuotesFromHash();
+  const imported=importQuotesFromHash(),feed=quoteFeed();
   let local=imported;
   if(!local){try{local=JSON.parse(localStorage.getItem('planner_quotes')||'null')}catch{}}
   if(local)useQuotes(local);
-  if(imported){showView();const el=document.getElementById('quoteSec');if(el)el.scrollIntoView({block:'center'});return}
+  const reveal=()=>{showView();const el=document.getElementById('quoteSec');if(el)el.scrollIntoView({block:'center'})};
+  if(imported){reveal();return}
+  if(feed){
+    try{
+      const r=await fetch(feed.url,{cache:'no-store'});
+      if(r.ok){const d=await r.json();if(Array.isArray(d.quotes)){localStorage.setItem('planner_quotes',JSON.stringify(d));useQuotes(d);if(feed.fresh)reveal();return}}
+    }catch{}
+    if(local)return;
+  }
   try{
     const r=await fetch('quotes.json',{cache:'no-cache'});if(!r.ok)return;
     const d=await r.json();
