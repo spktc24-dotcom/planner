@@ -295,6 +295,35 @@ h1.title{font-family:var(--serif);font-weight:600;font-size:clamp(34px,4.6vw,52p
 .seg button.on{background:var(--card);color:var(--accent);box-shadow:var(--shadow);font-weight:600}
 .btn-row{display:flex;gap:10px;flex-wrap:wrap}
 
+/* ══ NOTES (Думки) ══ */
+.capture{padding:14px 18px 12px;margin-bottom:16px}
+.capture textarea{width:100%;border:none;background:transparent;resize:none;font:inherit;font-size:15px;color:var(--text);outline:none;min-height:52px;line-height:1.55;display:block}
+.capture textarea::placeholder{color:var(--faint)}
+.capture-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+.capture-hint{font-size:12px;color:var(--faint)}
+.notes-tools{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.notes-search{flex:1;min-width:0;max-width:380px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px 12px;font:inherit;color:var(--text);outline:none}
+.notes-search:focus{border-color:var(--accent)}
+.notes-count{font-size:12.5px;color:var(--muted)}
+.notes-grid{columns:3 280px;column-gap:16px}
+.notes-grid+.notes-section{margin-top:14px}
+.notes-section{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:4px 0 10px;font-weight:500}
+.note{break-inside:avoid;display:block;margin-bottom:16px;padding:16px 18px 10px;cursor:pointer;transition:border-color .15s}
+.note:hover{border-color:var(--accent)}
+.note.pinned{border-color:color-mix(in srgb,var(--accent) 40%,var(--border))}
+.note-title{font-family:var(--serif);font-size:18px;font-weight:600;margin-bottom:6px;line-height:1.25;word-break:break-word}
+.note-text{font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:10;-webkit-box-orient:vertical;overflow:hidden}
+.note-foot{display:flex;align-items:center;gap:2px;margin-top:10px;color:var(--muted);font-size:12px}
+.note-date{margin-right:auto}
+.mini-btn.on{color:var(--accent)}
+.notes-banner{display:none;background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:12px 14px;font-size:13px;margin-bottom:16px;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;line-height:1.5}
+.notes-banner.show{display:flex}
+mark{background:color-mix(in srgb,var(--q-delegate) 32%,transparent);color:inherit;border-radius:3px;padding:0 1px}
+.modal.wide{max-width:660px}
+.note-edit-title{width:100%;border:none;background:transparent;font-family:var(--serif);font-size:24px;font-weight:600;color:var(--text);outline:none;margin-bottom:8px}
+.note-edit-text{width:100%;border:none;background:transparent;font:inherit;font-size:15px;line-height:1.6;color:var(--text);outline:none;resize:none;min-height:220px;display:block}
+.note-edit-meta{font-size:12px;color:var(--muted);margin-top:8px}
+
 /* ══ MODALS ══ */
 .overlay{display:none;position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center;padding:16px}
 .overlay.open{display:flex}
@@ -436,6 +465,7 @@ h1.title{font-family:var(--serif);font-weight:600;font-size:clamp(34px,4.6vw,52p
       <a href="#tasks" data-nav="tasks" data-ico="check">Завдання</a>
       <a href="#matrix" data-nav="matrix" data-ico="grid">Матриця Ейзенхауера</a>
       <a href="#goals" data-nav="goals" data-ico="target">Цілі</a>
+      <a href="#notes" data-nav="notes" data-ico="bulb">Думки</a>
       <a href="#analytics" data-nav="analytics" data-ico="chart">Аналітика</a>
     </nav>
     <div class="nav side-foot">
@@ -450,6 +480,7 @@ h1.title{font-family:var(--serif);font-weight:600;font-size:clamp(34px,4.6vw,52p
       <div class="top-actions">
         <button class="sync-pill offline" id="syncStatus" onclick="syncNow()" title="Синхронізувати зараз"><span class="dot"></span><span id="syncText">Офлайн режим</span></button>
         <button class="icon-btn theme-toggle" onclick="toggleTheme()" title="Змінити тему"></button>
+        <a class="icon-btn only-mobile" href="#analytics" data-ico="chart" title="Аналітика"></a>
         <a class="icon-btn only-mobile" href="#settings" data-ico="settings" title="Налаштування"></a>
       </div>
     </div>
@@ -563,6 +594,30 @@ h1.title{font-family:var(--serif);font-weight:600;font-size:clamp(34px,4.6vw,52p
       <div class="goals-grid" id="goalsList"></div>
     </section>
 
+    <!-- ══ NOTES (Думки) ══ -->
+    <section class="view" data-view="notes">
+      <div class="page-head">
+        <div><h1 class="title">Думки</h1><div class="subtitle">Ідеї, нотатки, все, що крутиться в голові. Звільніть місце для важливого.</div></div>
+        <button class="btn btn-primary" onclick="openNote()"><span data-ico="plus"></span>Нова думка</button>
+      </div>
+      <div class="notes-banner" id="notesBanner">
+        <span>Думки поки зберігаються тільки на цьому пристрої. Щоб вони синхронізувались між телефоном і комп'ютером, онови скрипт Google (кроки 2–3, «Нова версія»).</span>
+        <button class="btn" onclick="openSetup()">Оновити скрипт</button>
+      </div>
+      <div class="card capture">
+        <textarea id="noteCapture" rows="2" placeholder="Що у вас на думці?" oninput="autoGrow(this)"></textarea>
+        <div class="capture-foot">
+          <span class="capture-hint">Ctrl + Enter — зберегти</span>
+          <button class="btn btn-primary" onclick="captureNote()">Зберегти</button>
+        </div>
+      </div>
+      <div class="notes-tools">
+        <input class="notes-search" id="noteSearch" type="search" placeholder="Пошук у думках…" oninput="noteSearch=this.value;renderNotes()">
+        <span class="notes-count" id="notesCount"></span>
+      </div>
+      <div id="notesList"></div>
+    </section>
+
     <!-- ══ ANALYTICS ══ -->
     <section class="view" data-view="analytics">
       <div class="page-head">
@@ -607,11 +662,26 @@ h1.title{font-family:var(--serif);font-weight:600;font-size:clamp(34px,4.6vw,52p
   <a href="#calendar" data-nav="calendar" data-ico="calendar"><span>Календар</span></a>
   <a href="#tasks" data-nav="tasks" data-ico="check"><span>Завдання</span></a>
   <a href="#matrix" data-nav="matrix" data-ico="grid"><span>Матриця</span></a>
+  <a href="#notes" data-nav="notes" data-ico="bulb"><span>Думки</span></a>
   <a href="#goals" data-nav="goals" data-ico="target"><span>Цілі</span></a>
-  <a href="#analytics" data-nav="analytics" data-ico="chart"><span>Аналітика</span></a>
 </nav>
 
 <div class="text-tooltip" id="textTooltip"></div>
+
+<!-- ══ NOTE EDITOR ══ -->
+<div class="overlay" id="noteOverlay">
+  <div class="modal wide">
+    <input class="note-edit-title" id="noteTitle" placeholder="Заголовок (необов'язково)">
+    <textarea class="note-edit-text" id="noteText" placeholder="Запишіть думку…" oninput="autoGrow(this)"></textarea>
+    <div class="note-edit-meta" id="noteMeta"></div>
+    <div class="modal-actions">
+      <button class="btn" id="noteDeleteBtn" onclick="deleteNote(editingNoteId)" style="flex:0 0 auto;color:var(--danger)"><span data-ico="x"></span></button>
+      <button class="btn" id="noteTaskBtn" onclick="noteToTask(editingNoteId)" style="flex:0 0 auto" title="Зробити завданням"><span data-ico="plan"></span></button>
+      <button class="btn" onclick="closeNote()">Скасувати</button>
+      <button class="btn btn-primary" onclick="saveNote()">Зберегти</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ GOAL FORM ══ -->
 <div class="overlay" id="goalFormOverlay">
@@ -657,6 +727,7 @@ h1.title{font-family:var(--serif);font-weight:600;font-size:clamp(34px,4.6vw,52p
       <div class="script-box" id="scriptBox">const SPREADSHEET_ID = '1Y5YIuCSRnYJep9iWx6tpsWN3pzwBc4CoOWEL8awElKA';
 const SHEET_NAME = 'Tasks';
 const GOALS_SHEET_NAME = 'Цілі';
+const NOTES_SHEET_NAME = 'Думки';
 
 function getSheet() {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
@@ -678,6 +749,18 @@ function getGoalsSheet() {
     const h = sheet.getRange(1,1,1,5);
     h.setNumberFormat('@');
     h.setValues([['id','title','start','end','desc']]);
+  }
+  return sheet;
+}
+
+function getNotesSheet() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  let sheet = ss.getSheetByName(NOTES_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(NOTES_SHEET_NAME);
+    const h = sheet.getRange(1,1,1,6);
+    h.setNumberFormat('@');
+    h.setValues([['id','title','text','pinned','created','updated']]);
   }
   return sheet;
 }
@@ -760,6 +843,39 @@ function handle(e) {
     }
     if (action === 'deleteGoal') {
       const sheet = getGoalsSheet();
+      const rows = sheet.getDataRange().getValues();
+      for (let i = 1; i &lt; rows.length; i++) {
+        if (String(rows[i][0]) === String(data.id)) { sheet.deleteRow(i+1); break; }
+      }
+      return out({ok:true});
+    }
+    if (action === 'getAllNotes') {
+      const sheet = getNotesSheet();
+      const rows = sheet.getDataRange().getValues();
+      const notes = rows.slice(1)
+        .filter(r =&gt; r[0] &amp;&amp; String(r[0]).trim() !== '')
+        .map(r =&gt; ({
+          id: String(r[0]), title: String(r[1]||''), text: String(r[2]||''),
+          pinned: String(r[3]) === 'true',
+          created: String(r[4]||''), updated: String(r[5]||'')
+        }));
+      return out({ok:true, notes});
+    }
+    if (action === 'saveNote') {
+      const sheet = getNotesSheet();
+      const n = data.note;
+      const rows = sheet.getDataRange().getValues();
+      let found = -1;
+      for (let i = 1; i &lt; rows.length; i++) {
+        if (String(rows[i][0]) === String(n.id)) { found = i+1; break; }
+      }
+      const row = [String(n.id),String(n.title||''),String(n.text||''),String(!!n.pinned),String(n.created||''),String(n.updated||'')];
+      const r = sheet.getRange(found &gt; 0 ? found : sheet.getLastRow()+1,1,1,6);
+      r.setNumberFormat('@'); r.setValues([row]);
+      return out({ok:true});
+    }
+    if (action === 'deleteNote') {
+      const sheet = getNotesSheet();
       const rows = sheet.getDataRange().getValues();
       for (let i = 1; i &lt; rows.length; i++) {
         if (String(rows[i][0]) === String(data.id)) { sheet.deleteRow(i+1); break; }
@@ -888,7 +1004,9 @@ const ICONS={
   list:'<path d="M9 6h12M9 12h12M9 18h12M4 6h.01M4 12h.01M4 18h.01"/>',
   refresh:'<path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/>',
   edit:'<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
-  x:'<path d="M18 6 6 18M6 6l12 12"/>'
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  bulb:'<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.74V16a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-1.26A7 7 0 0 0 12 2z"/>',
+  pin:'<path d="M12 17v5"/><path d="M9 3h6l-1 6 3 3v2H7v-2l3-3z"/>'
 };
 function ico(n){return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">'+(ICONS[n]||'')+'</svg>'}
 document.querySelectorAll('[data-ico]').forEach(e=>e.insertAdjacentHTML('afterbegin',ico(e.dataset.ico)));
@@ -927,9 +1045,11 @@ let scriptUrl=localStorage.getItem('gs_script_url')||'https://script.google.com/
 // офлайн-черга зберігається в localStorage, щоб зміни не губилися після закриття застосунку
 let syncQueue=(()=>{try{return JSON.parse(localStorage.getItem('planner_sync_queue')||'[]')}catch{return[]}})();
 let goalSyncQueue=(()=>{try{return JSON.parse(localStorage.getItem('planner_goal_sync_queue')||'[]')}catch{return[]}})();
+let noteSyncQueue=(()=>{try{return JSON.parse(localStorage.getItem('planner_note_sync_queue')||'[]')}catch{return[]}})();
 function persistQueues(){
   localStorage.setItem('planner_sync_queue',JSON.stringify(syncQueue));
   localStorage.setItem('planner_goal_sync_queue',JSON.stringify(goalSyncQueue));
+  localStorage.setItem('planner_note_sync_queue',JSON.stringify(noteSyncQueue));
 }
 function qAdd(q,op){q.push(op);persistQueues()}
 
@@ -1022,8 +1142,15 @@ function setSyncStatus(state,text){
 // ══════════════════════════════════════════
 async function apiCall(body){
   if(!scriptUrl)throw new Error('no url');
-  const params=new URLSearchParams({payload:JSON.stringify(body),cb:Date.now()});
-  const r=await fetch(scriptUrl+'?'+params.toString(),{method:'GET',redirect:'follow'});
+  const payload=JSON.stringify(body);
+  let r;
+  if(payload.length>1500){
+    // довгі нотатки не влазять в URL — POST з text/plain (без CORS preflight), скрипт читає e.postData
+    r=await fetch(scriptUrl+'?cb='+Date.now(),{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:payload});
+  } else {
+    const params=new URLSearchParams({payload,cb:Date.now()});
+    r=await fetch(scriptUrl+'?'+params.toString(),{method:'GET',redirect:'follow'});
+  }
   const text=await r.text();
   try{return JSON.parse(text)}catch{throw new Error('bad json')}
 }
@@ -1101,8 +1228,10 @@ async function syncNow(){
         if(op.type==='delete')await apiCall({action:'deleteGoal',id:op.id});
         goalSyncQueue.shift();persistQueues();
       }
+      await flushNoteQueue();
       await pullFromSheets();
       await pullGoalsFromSheets();
+      await pullNotesFromSheets();
     }catch(err){
       setSyncStatus('err','Офлайн — збережено локально');
       console.error('syncNow error',err);
@@ -1161,11 +1290,173 @@ function pushGoalDelete(id){
 function autoSync(){
   if(!scriptUrl||isProcessing||opQueue.length>0)return;
   // є невідправлені офлайн-зміни — спочатку відправити, інакше pull їх перезапише
-  if(syncQueue.length||goalSyncQueue.length){syncNow();return}
+  if(syncQueue.length||goalSyncQueue.length||(noteSyncQueue.length&&!notesUnsupported)){syncNow();return}
   enqueue(async()=>{
-    try{ await pullFromSheets(); await pullGoalsFromSheets(); }
+    try{ await pullFromSheets(); await pullGoalsFromSheets(); await pullNotesFromSheets(); }
     catch(err){ console.error('autoSync error',err); }
   });
+}
+
+// ══════════════════════════════════════════
+// NOTES (Думки) — аркуш "Думки"; поки скрипт не оновлено,
+// живуть локально, а черга чекає на відправку
+// ══════════════════════════════════════════
+let notesUnsupported=false;   // старий скрипт відповідає 'unknown action'
+let pendingNoteIds=new Set(), pendingNoteDeletes=new Set();
+let noteSearch='', editingNoteId=null;
+function loadNotes(){try{return JSON.parse(localStorage.getItem('planner_notes')||'[]')}catch{return[]}}
+function saveNotesList(n){localStorage.setItem('planner_notes',JSON.stringify(n))}
+function isUnknownAction(res){return res&&!res.ok&&String(res.error||'').includes('unknown action')}
+function markNotesUnsupported(){if(!notesUnsupported){notesUnsupported=true;renderNotes()}}
+
+async function flushNoteQueue(){
+  if(notesUnsupported)return;
+  while(noteSyncQueue.length){
+    const op=noteSyncQueue[0];
+    const res=await apiCall(op.type==='save'?{action:'saveNote',note:op.note}:{action:'deleteNote',id:op.id});
+    if(!res.ok){if(isUnknownAction(res))markNotesUnsupported();return}
+    noteSyncQueue.shift();persistQueues();
+  }
+}
+async function pullNotesFromSheets(){
+  if(!scriptUrl||notesUnsupported)return;
+  const res=await apiCall({action:'getAllNotes'});
+  if(!res.ok){if(isUnknownAction(res))markNotesUnsupported();return}
+  // локальні зміни, які ще не дійшли до таблиці, не перезаписуємо
+  const queuedSave=new Set(noteSyncQueue.filter(o=>o.type==='save').map(o=>o.note.id));
+  const queuedDel=new Set(noteSyncQueue.filter(o=>o.type==='delete').map(o=>o.id));
+  const keep=loadNotes().filter(n=>pendingNoteIds.has(n.id)||queuedSave.has(n.id));
+  const keepIds=new Set(keep.map(n=>n.id));
+  const remote=res.notes
+    .filter(n=>!keepIds.has(n.id)&&!queuedDel.has(n.id)&&!pendingNoteDeletes.has(n.id))
+    .map(n=>({...n,pinned:n.pinned===true||n.pinned==='true'}));
+  saveNotesList(remote.concat(keep));
+  renderNotes();
+}
+function pushNote(note){
+  if(!scriptUrl||notesUnsupported){qAdd(noteSyncQueue,{type:'save',note});return}
+  pendingNoteIds.add(note.id);
+  enqueue(async()=>{
+    try{
+      const res=await apiCall({action:'saveNote',note});
+      if(!res.ok){if(isUnknownAction(res))markNotesUnsupported();qAdd(noteSyncQueue,{type:'save',note})}
+      else setSyncStatus('ok','Збережено ✓');
+    }catch{qAdd(noteSyncQueue,{type:'save',note});setSyncStatus('err','Офлайн — збережено локально')}
+    finally{pendingNoteIds.delete(note.id)}
+  });
+}
+function pushNoteDelete(id){
+  if(!scriptUrl||notesUnsupported){qAdd(noteSyncQueue,{type:'delete',id});return}
+  pendingNoteDeletes.add(id);
+  enqueue(async()=>{
+    try{
+      const res=await apiCall({action:'deleteNote',id});
+      if(!res.ok){if(isUnknownAction(res))markNotesUnsupported();qAdd(noteSyncQueue,{type:'delete',id})}
+    }catch{qAdd(noteSyncQueue,{type:'delete',id})}
+    finally{pendingNoteDeletes.delete(id)}
+  });
+}
+
+function autoGrow(el){el.style.height='auto';el.style.height=el.scrollHeight+'px'}
+function fmtNoteDate(iso){
+  const d=new Date(iso);if(isNaN(d))return'';
+  const hm=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+  const ds=dateStr(d.getFullYear(),d.getMonth(),d.getDate());
+  const y=new Date(current);y.setDate(y.getDate()-1);
+  if(ds===todayStr())return'Сьогодні, '+hm;
+  if(ds===dateStr(y.getFullYear(),y.getMonth(),y.getDate()))return'Вчора, '+hm;
+  return d.getDate()+' '+MONTHS_GEN[d.getMonth()]+(d.getFullYear()!==current.getFullYear()?' '+d.getFullYear():'')+', '+hm;
+}
+function hl(text,q){
+  const safe=esc(text);
+  if(!q)return safe;
+  const re=new RegExp(esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+  return safe.replace(re,m=>'<mark>'+m+'</mark>');
+}
+function noteCard(n,q){
+  return `<div class="card note${n.pinned?' pinned':''}" onclick="openNote('${n.id}')">
+    ${n.title?`<div class="note-title">${hl(n.title,q)}</div>`:''}
+    <div class="note-text">${hl(n.text,q)}</div>
+    <div class="note-foot">
+      <span class="note-date">${fmtNoteDate(n.updated)}</span>
+      <button class="mini-btn${n.pinned?' on':''}" onclick="event.stopPropagation();togglePin('${n.id}')" title="${n.pinned?'Відкріпити':'Закріпити'}">${ico('pin')}</button>
+      <button class="mini-btn" onclick="event.stopPropagation();noteToTask('${n.id}')" title="Зробити завданням">${ico('plan')}</button>
+      <button class="mini-btn" onclick="event.stopPropagation();deleteNote('${n.id}')" title="Видалити">${ico('x')}</button>
+    </div>
+  </div>`;
+}
+function renderNotes(){
+  document.getElementById('notesBanner').classList.toggle('show',notesUnsupported);
+  const all=loadNotes();
+  const q=noteSearch.trim().toLowerCase();
+  const notes=all.filter(n=>!q||((n.title||'')+' '+(n.text||'')).toLowerCase().includes(q))
+    .sort((a,b)=>a.updated<b.updated?1:a.updated>b.updated?-1:0);
+  document.getElementById('notesCount').textContent=q?notes.length+' з '+all.length:all.length?all.length+' '+plural(all.length,'думка','думки','думок'):'';
+  const el=document.getElementById('notesList');
+  if(!notes.length){
+    el.innerHTML='<div class="empty-state">'+(q?'Нічого не знайдено':'Тут поки порожньо. Запишіть першу думку вище — навіть одне речення.')+'</div>';
+    return;
+  }
+  const pinned=notes.filter(n=>n.pinned),rest=notes.filter(n=>!n.pinned);
+  let html='';
+  if(pinned.length)html+='<div class="notes-section">Закріплені</div><div class="notes-grid">'+pinned.map(n=>noteCard(n,q)).join('')+'</div>';
+  if(rest.length)html+=(pinned.length?'<div class="notes-section">Інші</div>':'')+'<div class="notes-grid">'+rest.map(n=>noteCard(n,q)).join('')+'</div>';
+  el.innerHTML=html;
+}
+
+function upsertNote(note){
+  const list=loadNotes();
+  const i=list.findIndex(n=>n.id===note.id);
+  if(i>=0)list[i]=note;else list.push(note);
+  saveNotesList(list);renderNotes();pushNote(note);
+}
+function captureNote(){
+  const ta=document.getElementById('noteCapture');
+  const text=ta.value.trim();
+  if(!text){ta.focus();return}
+  const now=new Date().toISOString();
+  upsertNote({id:'n'+Date.now(),title:'',text,pinned:false,created:now,updated:now});
+  ta.value='';autoGrow(ta);ta.focus();
+}
+function openNote(id){
+  const n=id&&loadNotes().find(x=>x.id===id);
+  editingNoteId=n?n.id:null;
+  document.getElementById('noteTitle').value=n?n.title||'':'';
+  const ta=document.getElementById('noteText');
+  ta.value=n?n.text||'':'';
+  document.getElementById('noteMeta').textContent=n?'Змінено: '+fmtNoteDate(n.updated):'';
+  document.getElementById('noteDeleteBtn').style.display=n?'':'none';
+  document.getElementById('noteTaskBtn').style.display=n?'':'none';
+  document.getElementById('noteOverlay').classList.add('open');
+  setTimeout(()=>{autoGrow(ta);(n?ta:document.getElementById('noteText')).focus()},60);
+}
+function closeNote(){document.getElementById('noteOverlay').classList.remove('open');editingNoteId=null}
+function saveNote(){
+  const title=document.getElementById('noteTitle').value.trim();
+  const text=document.getElementById('noteText').value.trim();
+  const old=editingNoteId&&loadNotes().find(n=>n.id===editingNoteId);
+  if(!title&&!text){closeNote();return}
+  if(old&&old.title===title&&old.text===text){closeNote();return}
+  const now=new Date().toISOString();
+  upsertNote(old?{...old,title,text,updated:now}:{id:'n'+Date.now(),title,text,pinned:false,created:now,updated:now});
+  closeNote();
+}
+function deleteNote(id){
+  if(!id||!confirm('Видалити думку?'))return;
+  saveNotesList(loadNotes().filter(n=>n.id!==id));
+  if(editingNoteId===id)closeNote();
+  renderNotes();pushNoteDelete(id);
+}
+function togglePin(id){
+  const n=loadNotes().find(x=>x.id===id);
+  if(n)upsertNote({...n,pinned:!n.pinned});
+}
+function noteToTask(id){
+  const n=loadNotes().find(x=>x.id===id);
+  if(!n)return;
+  closeNote();
+  openModal();
+  document.getElementById('taskText').value=[n.title,n.text].filter(Boolean).join('\n');
 }
 
 // ══════════════════════════════════════════
@@ -1202,7 +1493,7 @@ function copyScript(e){
 // ══════════════════════════════════════════
 // ROUTING
 // ══════════════════════════════════════════
-const VIEWS=['plan','calendar','tasks','matrix','goals','analytics','settings'];
+const VIEWS=['plan','calendar','tasks','matrix','goals','notes','analytics','settings'];
 function currentView(){const h=location.hash.slice(1);return VIEWS.includes(h)?h:'plan'}
 function go(v){location.hash='#'+v}
 function showView(){
@@ -1227,7 +1518,7 @@ function render(){
   renderHeaderDate();renderAlert();renderWeekPlan();renderMiniCal();
   renderMatrix('matrix',QUAD_LIMIT,false);renderGoalCards();
   renderCalendar();renderDayView();
-  renderTasksView();renderMatrix('matrixFull',Infinity,true);renderGoalsList();renderAnalytics();
+  renderTasksView();renderMatrix('matrixFull',Infinity,true);renderGoalsList();renderNotes();renderAnalytics();
 }
 function renderHeaderDate(){
   document.getElementById('todayLine').textContent=DOW_FULL[current.getDay()]+', '+current.getDate()+' '+MONTHS_GEN[current.getMonth()]+' '+current.getFullYear();
@@ -1945,18 +2236,19 @@ function deleteTask(id){
 // ══════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════
-['overlay','setupOverlay','goalFormOverlay'].forEach(id=>{
-  document.getElementById(id).addEventListener('click',function(e){
-    if(e.target!==this)return;
-    if(id==='overlay')closeModal();else if(id==='setupOverlay')closeSetup();else closeGoalForm();
-  });
+const OVERLAY_CLOSE={overlay:()=>closeModal(),setupOverlay:()=>closeSetup(),goalFormOverlay:()=>closeGoalForm(),noteOverlay:()=>saveNote()};
+Object.keys(OVERLAY_CLOSE).forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)OVERLAY_CLOSE[id]()});
 });
+// Ctrl/Cmd+Enter зберігає думку — і в швидкому полі, і в редакторі
+document.getElementById('noteCapture').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();captureNote()}});
+document.getElementById('noteOverlay').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();saveNote()}});
 document.querySelector('#overlay .modal').addEventListener('click',function(e){if(!e.target.closest('.date-field'))closeDatePicker()});
 document.addEventListener('keydown',e=>{
   const anyOpen=document.querySelector('.overlay.open');
   const typing=/INPUT|TEXTAREA/.test(document.activeElement?.tagName||'');
   if(!anyOpen&&!typing&&(e.key==='n'||e.key==='N'))openModal();
-  if(e.key==='Escape'){closeModal();closeSetup();closeGoalForm();hideTextTooltip()}
+  if(e.key==='Escape'){closeModal();closeSetup();closeGoalForm();closeNote();hideTextTooltip()}
 });
 document.addEventListener('click',hideTextTooltip);
 setInterval(()=>{current=new Date();render()},30000);
