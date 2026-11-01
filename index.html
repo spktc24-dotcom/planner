@@ -1574,10 +1574,29 @@ function renderQuote(){
   const src=q.mine?'Моя думка до «'+esc(q.b)+'»':(q.a?esc(q.a)+', ':'')+'«'+esc(q.b)+'»'+(q.p?', с. '+q.p:'');
   el.innerHTML=`<div class="quote-top"><span class="quote-label">Цитата дня</span>${QUOTES.length>1?'<button class="chip-btn" onclick="nextQuote()">Інша</button>':''}</div><blockquote class="quote-text">${esc(q.t)}</blockquote><div class="quote-src">${src}</div>`;
 }
+// «Книжкова полиця» відкриває планувальник за посиланням #quotes=<base64url JSON>: цитати зберігаються на цьому пристрої
+function importQuotesFromHash(){
+  const h=location.hash;if(!h.startsWith('#quotes='))return null;
+  history.replaceState(null,'',location.pathname+location.search+'#plan');
+  try{
+    const b=atob(h.slice(8).replace(/-/g,'+').replace(/_/g,'/'));
+    const d=JSON.parse(new TextDecoder().decode(Uint8Array.from(b,c=>c.charCodeAt(0))));
+    if(!Array.isArray(d.quotes))return null;
+    localStorage.setItem('planner_quotes',JSON.stringify(d));
+    return d;
+  }catch{return null}
+}
+function useQuotes(d){QUOTES=(d.quotes||[]).filter(q=>q&&q.t);renderQuote()}
 async function loadQuotes(){
+  const imported=importQuotesFromHash();
+  let local=imported;
+  if(!local){try{local=JSON.parse(localStorage.getItem('planner_quotes')||'null')}catch{}}
+  if(local)useQuotes(local);
+  if(imported){showView();const el=document.getElementById('quoteSec');if(el)el.scrollIntoView({block:'center'});return}
   try{
     const r=await fetch('quotes.json',{cache:'no-cache'});if(!r.ok)return;
-    const d=await r.json();QUOTES=(d.quotes||[]).filter(q=>q&&q.t);renderQuote();
+    const d=await r.json();
+    if(!local||String(d.updated||'')>String(local.updated||''))useQuotes(d);
   }catch{}
 }
 
