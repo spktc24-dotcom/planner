@@ -114,6 +114,11 @@ h1.title{font-family:var(--serif);font-weight:600;font-size:clamp(34px,4.6vw,52p
 .alert-pill .ico{width:17px;height:17px}
 .alert-pill:hover{filter:brightness(.97)}
 .sec{margin-bottom:28px}
+.quote-card{padding:20px 22px;display:flex;flex-direction:column;gap:10px;border-left:4px solid var(--accent)}
+.quote-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.quote-label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.quote-text{font-family:var(--serif);font-size:clamp(17px,1.8vw,21px);line-height:1.45}
+.quote-src{color:var(--muted);font-size:13px}
 .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px}
 
 /* week plan */
@@ -505,6 +510,7 @@ mark{background:color-mix(in srgb,var(--q-delegate) 32%,transparent);color:inher
             </div>
             <button class="alert-pill" id="alertPill" onclick="go('tasks')"><span data-ico="alert"></span><span id="alertText"></span><span data-ico="chevR"></span></button>
           </div>
+          <div class="sec sec-quote" id="quoteSec" hidden><div class="card quote-card" id="quoteCard"></div></div>
           <div class="sec sec-week">
             <div class="card week-card">
               <div class="week-head">
@@ -1539,8 +1545,44 @@ function changeMonth(dir){
   if(viewMonth<0){viewMonth=11;viewYear--}
   selectedDay=null;render();
 }
+// ══ ЦИТАТА ДНЯ: цитати з «Книжкової полиці», файл quotes.json поруч зі сторінкою ══
+let QUOTES=[];
+function dayNumber(d){d=d||new Date();return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)}
+// стабільне перемішування: щодня нова цитата, і цитати з однієї книги не йдуть підряд
+function quoteOrder(n){
+  const idx=[...Array(n).keys()];let s=20261101;
+  const rnd=()=>(s=(s*1103515245+12345)%2147483648)/2147483648;
+  for(let i=n-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}
+  return idx;
+}
+function quoteShift(){try{const s=JSON.parse(localStorage.getItem('planner_quote_shift')||'{}');return s.day===dayNumber()?(s.n||0):0}catch{return 0}}
+function quoteToday(){
+  if(!QUOTES.length)return null;
+  const order=quoteOrder(QUOTES.length);
+  return QUOTES[order[(dayNumber()+quoteShift())%QUOTES.length]];
+}
+function nextQuote(){
+  try{localStorage.setItem('planner_quote_shift',JSON.stringify({day:dayNumber(),n:quoteShift()+1}))}catch{}
+  renderQuote();
+}
+function renderQuote(){
+  const el=document.getElementById('quoteCard');if(!el)return;
+  const q=quoteToday();
+  const sec=document.getElementById('quoteSec');
+  if(!q){if(sec)sec.hidden=true;return}
+  if(sec)sec.hidden=false;
+  const src=q.mine?'Моя думка до «'+esc(q.b)+'»':(q.a?esc(q.a)+', ':'')+'«'+esc(q.b)+'»'+(q.p?', с. '+q.p:'');
+  el.innerHTML=`<div class="quote-top"><span class="quote-label">Цитата дня</span>${QUOTES.length>1?'<button class="chip-btn" onclick="nextQuote()">Інша</button>':''}</div><blockquote class="quote-text">${esc(q.t)}</blockquote><div class="quote-src">${src}</div>`;
+}
+async function loadQuotes(){
+  try{
+    const r=await fetch('quotes.json',{cache:'no-cache'});if(!r.ok)return;
+    const d=await r.json();QUOTES=(d.quotes||[]).filter(q=>q&&q.t);renderQuote();
+  }catch{}
+}
+
 function render(){
-  renderHeaderDate();renderAlert();renderWeekPlan();renderMiniCal();
+  renderHeaderDate();renderAlert();renderQuote();renderWeekPlan();renderMiniCal();
   renderMatrix('matrix',QUAD_LIMIT,false);renderGoalCards();
   renderCalendar();renderDayView();
   renderTasksView();renderMatrix('matrixFull',Infinity,true);renderGoalsList();renderNotes();renderAnalytics();
@@ -2324,6 +2366,7 @@ if(scriptUrl){setSyncStatus('syncing','Завантаження...');syncNow()}
 else setSyncStatus('offline','Офлайн режим');
 render();
 showView();
+loadQuotes();
 </script>
 </body>
 </html>

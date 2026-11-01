@@ -1,8 +1,8 @@
 // Service worker: дозволяє встановити планувальник як застосунок і відкривати його без інтернету.
 // Сторінки — спочатку мережа (щоб оновлення приходили одразу), кеш — запасний варіант.
 // Запити до Google Apps Script не кешуються: синхронізація завжди йде наживо.
-const CACHE = 'planner-v5';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
+const CACHE = 'planner-v6';
+const SHELL = ['./', './index.html', './manifest.webmanifest', './quotes.json', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
